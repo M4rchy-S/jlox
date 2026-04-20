@@ -4,6 +4,10 @@
 #include "common.h"
 #include "scanner.h"
 
+#include "object.h"
+#include "value.h"
+#include "vm.h"
+
 typedef struct {
     const char* start;
     const char* current;
@@ -42,6 +46,28 @@ static Token errorToken(const char* message) {
 
 static char peek() {
     return *scanner.current;
+}
+
+
+static bool call(ObjFunction* function, int argCount) {
+    CallFrame* frame = &vm.frames[vm.frameCount++];
+    frame->function = function;
+    frame->ip = function->chunk.code;
+    frame->slots = vm.stackTop - argCount - 1;
+    return true;
+}
+
+static bool callValue(Value callee, int argCount) {
+    if (IS_OBJ(callee)) {
+        switch (OBJ_TYPE(callee)) {
+            case OBJ_FUNCTION:
+                return call(AS_FUNCTION(callee), argCount);
+            default:
+                break; // Non-callable object type.
+        }
+    }
+    // runtimeError("Can only call functions and classes.");
+    return false;
 }
 
 static char advance() {
