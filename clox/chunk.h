@@ -28,6 +28,10 @@ typedef enum {
     OP_RETURN,
     OP_EQUAL,
     OP_GREATER,
+    OP_CLOSURE,
+    OP_CLOSE_UPVALUE,
+    OP_GET_UPVALUE,
+    OP_SET_UPVALUE,
     OP_LESS,
     OP_CALL,
   } OpCode;
